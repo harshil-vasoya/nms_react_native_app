@@ -18,6 +18,8 @@ import * as Location from 'expo-location';
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MenuScreen from "./MenuScreen";
+import Toast from 'react-native-root-toast';
+
 const TreeSpecies = [
   {
     "Family ": "Meliaceae",
@@ -377,13 +379,18 @@ const DetectedTagScreen = () => {
 
   const saveData = () => {
     try{
-    console.log({
-      SelectedSpecies: selectedSpecies,
-      Latitude: latitude,
-      Longitude: longitude,
-      Height: height,
-      Width: width,
+    fetch("http://192.168.1.3:3007/data/adddata" , {method: 'POST',  headers: {
+      'Content-Type': 'application/json',
+  }, body: JSON.stringify({Height:height,Width:width,Latitude:latitude,Longitude:longitude,SpeciesName:selectedSpecies})
+}).then((response) => {
+  if(response.status == 200){
+    
+    Toast.show('Data Saved Successfully', {
+      duration: Toast.durations.LONG,
+      position: Toast.positions.BOTTOM,
     });
+  }
+});
     discardData();
     navigation.navigate('Menu'); 
   } catch (error) {

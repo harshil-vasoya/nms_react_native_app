@@ -76,7 +76,7 @@ const FinalReportScreen = () => {
   
   const fetchData = async () => {
     console.log('Fetching data...');
-  const data = await fetch('http://192.168.1.2:3007/pythonscript/merged-script' , {method: 'POST'})
+  const data = await fetch('http://192.168.1.3:3007/pythonscript/merged-script' , {method: 'POST'})
   const res = await data.json()
   setResponse(res)
   setImage(res.photopath)

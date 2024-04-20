@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { StatusBar, Modal, TouchableWithoutFeedback, Dimensions, Image } from 'react-native';
 import tw from 'twrnc';
 import { SafeAreaView, ScrollView, Text, View, TouchableOpacity, StyleSheet } from 'react-native';
-import * as DocumentPicker from 'expo-document-picker';
+6
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import Toast from 'react-native-root-toast';
