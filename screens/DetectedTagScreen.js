@@ -378,6 +378,14 @@ const DetectedTagScreen = () => {
   };
 
   const saveData = () => {
+
+    if(!latitude || !longitude || !height || !width || selectedSpecies == "Select Species"){
+      Toast.show('Please fill all the fields', {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.BOTTOM,
+      });
+      return;
+    }
     try{
     fetch("http://192.168.1.3:3007/data/adddata" , {method: 'POST',  headers: {
       'Content-Type': 'application/json',
@@ -389,10 +397,18 @@ const DetectedTagScreen = () => {
       duration: Toast.durations.LONG,
       position: Toast.positions.BOTTOM,
     });
+    discardData();
+    navigation.navigate('Menu');
+  }
+  else
+  {
+    Toast.show('Data not Saved , please Try again', {
+      duration: Toast.durations.LONG,
+      position: Toast.positions.BOTTOM,
+    });
   }
 });
-    discardData();
-    navigation.navigate('Menu'); 
+     
   } catch (error) {
     console.error(error);
   }
