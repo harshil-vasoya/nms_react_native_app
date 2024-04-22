@@ -12,6 +12,7 @@ const { width, height } = Dimensions.get('window');
 
 const DiversityScreen = () => {
   const [pickedFileName, setPickedFileName] = useState(null);
+  const [file, setfile] = useState(null);
     const [response, setResponse] = useState(null);
     const [image, setImage] = useState(null);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -31,18 +32,42 @@ const DiversityScreen = () => {
     const pickCsvFile = async () => {
       try {
         const result = await DocumentPicker.getDocumentAsync({
-          type: 'text/csv',
           copyToCacheDirectory: true,
         });
   
-        console.log('Document Picker Result:', result); // Debugging line
+        // console.log('Document Picker Result:', result); // Debugging line
   
-        if (result.type !== 'cancel') {
-          setPickedFileName(result.name);
-        }
-      } catch (error) {
+          if (result.type !== 'cancel') {
+            const fileNameParts = result.assets[0].uri.split('.')
+            const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
+            if (fileExtension == 'csv') {
+              setPickedFileName(result.assets[0].name);
+              setfile(result.assets[0].uri);
+              console.log(result.assets[0].name);
+            }
+            else
+            {
+              Toast.show('Please select a CSV file', {
+                duration: Toast.durations.LONG,
+                position: Toast.positions.BOTTOM,
+              });
+            }
+            }
+            else
+            {
+              Toast.show('Please select a CSV file', {
+                duration: Toast.durations.LONG,
+                position: Toast.positions.BOTTOM,
+              });
+            }
+        
+      
+     } catch (error) {
         console.error('Error picking file:', error);
-        alert('An error occurred while picking the file.');
+        Toast.show('An error occurred while picking the file.', {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        });
       }
     };
   
@@ -76,6 +101,7 @@ const DiversityScreen = () => {
       setResponse(null);
       setPickedFileName(null);
       setImage(null);
+      setfile(null);
     };
   
     const handleModalVisible = (isVisible) => {
@@ -129,7 +155,7 @@ const DiversityScreen = () => {
                   </>
                   : null}
               </View>
-              <TouchableOpacity onPress={() => fetchData("distribution-map", setResponse, setImage)} style={tw`py-3 bg-green-600 rounded-md mx-4 mb-6`}>
+              <TouchableOpacity onPress={() => fetchData("distribution-map",pickedFileName,file, setResponse, setImage)} style={tw`py-3 bg-green-600 rounded-md mx-4 mb-6`}>
               <Text style={tw`text-xl font-bold text-center text-white`}>
                 Submit Data
               </Text>

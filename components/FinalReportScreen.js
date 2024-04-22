@@ -6,31 +6,55 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system'
 import * as MediaLibrary from 'expo-media-library'
 import Toast from 'react-native-root-toast';
+import { Alert } from 'react-native';
 
 
-const { width, height } = Dimensions.get('window');
 
 const FinalReportScreen = () => {
   const [pickedFileName, setPickedFileName] = useState(null);
+  const [file, setfile] = useState(null); // [1
   const [response, setResponse] = useState(null);
   const [image, setImage] = useState(null);
-
+  
   const pickCsvFile = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: 'text/csv',
         copyToCacheDirectory: true,
       });
 
-      console.log('Document Picker Result:', result); // Debugging line
+      // console.log('Document Picker Result:', result); // Debugging line
 
-      if (result.type !== 'cancel') {
-        // alert(`Picked file: ${result.name}`);
-        setPickedFileName(result.name);
-      }
-    } catch (error) {
+        if (result.type !== 'cancel') {
+          const fileNameParts = result.assets[0].uri.split('.')
+          const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
+          if (fileExtension == 'csv') {
+            setPickedFileName(result.assets[0].name);
+            setfile(result.assets[0].uri);
+            console.log(result.assets[0].name);
+          }
+          else
+          {
+            Toast.show('Please select a CSV file', {
+              duration: Toast.durations.LONG,
+              position: Toast.positions.BOTTOM,
+            });
+          }
+          }
+          else
+          {
+            Toast.show('Please select a CSV file', {
+              duration: Toast.durations.LONG,
+              position: Toast.positions.BOTTOM,
+            });
+          }
+      
+    
+   } catch (error) {
       console.error('Error picking file:', error);
-      alert('An error occurred while picking the file.');
+      Toast.show('An error occurred while picking the file.', {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.BOTTOM,
+      });
     }
   };
   const saveToPhone = async (url) => {
@@ -71,17 +95,32 @@ const FinalReportScreen = () => {
     setResponse(null)
     setPickedFileName(null)
     setImage(null)
+    setfile(null)
 
   }
   
-  const fetchData = async () => {
-    console.log('Fetching data...');
-  const data = await fetch('http://192.168.1.3:3007/pythonscript/merged-script' , {method: 'POST'})
-  const res = await data.json()
-  setResponse(res)
-  setImage(res.photopath)
+  const fetchData = async (endpoint) => {
+    if(!file || !pickedFileName){
+      Alert.alert("Alert", "Please select a CSV file");
+      return;
+    }
 
-  console.log('Data fetched')
+    const formData = new FormData();
+    formData.append('csvFile', {
+      uri: file,
+      name: pickedFileName,
+      type: 'text/csv', // Adjust the MIME type according to your file type
+    });
+  console.log(formData);
+const data = await fetch(`http://192.168.1.3:3007/pythonscript/${endpoint}`, {method: 'POST' , body: formData})
+console.log("hiit 22")    
+const res = await data.json()
+setResponse(res)
+setImage(res.photopath)
+
+console.log(res)
+
+   
     
   };
   return (
@@ -138,7 +177,7 @@ const FinalReportScreen = () => {
 
 
         {/* submit button for the fetch api */}
-      <TouchableOpacity onPress={() => {fetchData()}} style={tw`py-3 bg-green-600 rounded-md mx-4 mb-6`}>
+      <TouchableOpacity onPress={() => {fetchData("merged-script")}} style={tw`py-3 bg-green-600 rounded-md mx-4 mb-6`}>
         <Text style={tw`text-xl font-bold text-center text-white`}>
           Submit Data
         </Text>
