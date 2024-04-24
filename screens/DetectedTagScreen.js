@@ -19,6 +19,8 @@ import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MenuScreen from "./MenuScreen";
 import Toast from 'react-native-root-toast';
+import { Alert } from 'react-native';
+
 
 const TreeSpecies = [
   {
@@ -390,7 +392,8 @@ const DetectedTagScreen = () => {
     fetch("http://192.168.1.3:3007/data/adddata" , {method: 'POST',  headers: {
       'Content-Type': 'application/json',
   }, body: JSON.stringify({Height:height,Width:width,Latitude:latitude,Longitude:longitude,SpeciesName:selectedSpecies})
-}).then((response) => {
+}).then((response)=>response.json())
+.then((response) => {
   if(response.status == 200){
     
     Toast.show('Data Saved Successfully', {
@@ -402,10 +405,12 @@ const DetectedTagScreen = () => {
   }
   else
   {
-    Toast.show('Data not Saved , please Try again', {
+    Toast.show(response.message, {
       duration: Toast.durations.LONG,
       position: Toast.positions.BOTTOM,
     });
+    setLatitude(null);
+    setLongitude(null);
   }
 });
      
@@ -426,8 +431,11 @@ const DetectedTagScreen = () => {
     }
 
     let location = await Location.getCurrentPositionAsync({});
-    setLatitude(`${location.coords.latitude}° ${location.coords.latitude >= 0 ? 'N' : 'S'}`);
-    setLongitude(`${location.coords.longitude}° ${location.coords.longitude >= 0 ? 'E' : 'W'}`);
+    // console.log(location.coords.latitude.toString(), location.coords.longitude.toString());
+    // setLatitude(`${location.coords.latitude}° ${location.coords.latitude >= 0 ? 'N' : 'S'}`);
+    setLatitude(location.coords.latitude.toString());
+    // setLongitude(`${location.coords.longitude}° ${location.coords.longitude >= 0 ? 'E' : 'W'}`);
+    setLongitude(location.coords.longitude.toString());
   };
 
   return (
